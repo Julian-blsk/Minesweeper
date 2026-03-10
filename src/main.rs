@@ -6,7 +6,7 @@ mod game_ui;
 slint::include_modules!();
 
 use std::{cell::RefCell, rc::Rc};
-//Test
+
 use game::Game;
 use game_ui::GameUi;
 use slint::ModelRc;

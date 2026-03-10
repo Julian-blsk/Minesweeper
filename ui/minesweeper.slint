@@ -62,14 +62,22 @@ export component MainWindow inherits Window {
                     visible: cell_data.is_revealed && !cell_data.is_flagged;
                 }
 
-                Image{
+                Image {
                     source: @image-url("flag.png");
                     width: 30px;
                     height: 30px;
                     horizontal-alignment: center;
                     vertical-alignment: center;
                     visible: cell_data.is_flagged;
+                }
 
+                Image {
+                    source: @image-url("bomb.png");
+                    width: 30px;
+                    height: 30px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    visible: cell_data.is_mine && cell_data.is_revealed;
                 }
 
                 TouchArea {
