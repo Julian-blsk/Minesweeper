@@ -1,0 +1,88 @@
+export struct CellData {
+    x: int,
+    y: int,
+    is_mine: bool,
+    is_revealed: bool,
+    number: string,
+    is_flagged: bool,
+}
+
+export component MainWindow inherits Window {
+    preferred-width: 573px;
+    preferred-height: 653px;
+    title: "Minesweeper";
+
+    callback cell_clicked(x: int, y: int);
+    callback cell_right_clicked(x: int, y: int);
+    in-out property <string> game_status;
+    in-out property <int> mines_left;
+    in-out property <[CellData]> cells;
+
+    VerticalLayout {
+        alignment: start;
+        spacing: 10px;
+        padding: 10px;
+        Text {
+            text: "Minen: " + root.mines_left;
+            font-size: 20px;
+            horizontal-alignment: center;
+        }
+
+        Text {
+            text: root.game_status;
+            font-size: 20px;
+            horizontal-alignment: center;
+        }
+
+        GridLayout {
+            spacing: 2px;
+            for cell_data in cells: Rectangle {
+                width: 35px;
+                height: 35px;
+                row: cell_data.y;
+                col: cell_data.x;
+                background: {
+                    if cell_data.is_flagged {
+                        #44ff44
+                    } else if !cell_data.is_revealed {
+                        #4444ffff
+                    } else if cell_data.is_mine {
+                        #ff4444ff
+                    } else {
+                        #cccccccc
+                    }
+                }
+                border-width: 1px;
+                border-color: #000000;
+                Text {
+                    text: cell_data.number;
+                    color: black;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    visible: cell_data.is_revealed && !cell_data.is_flagged;
+                }
+
+                Image{
+                    source: @image-url("flag.png");
+                    width: 30px;
+                    height: 30px;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    visible: cell_data.is_flagged;
+
+                }
+
+                TouchArea {
+                    clicked => {
+                        cell_clicked(cell_data.x, cell_data.y);
+                    }
+                    pointer-event(event) => {
+                        if (event.button == PointerEventButton.right && event.kind == PointerEventKind.down) {
+                            cell_right_clicked(cell_data.x, cell_data.y);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
