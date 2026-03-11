@@ -28,11 +28,12 @@ impl GameUi {
                 number: SharedString::from(""),
             });
         }
+
         let ui_cells = Rc::new(VecModel::from(cells));
-        let instance = Self { game, ui_cells };
-        instance.synch_board_to_ui();
-        instance
+
+        Self { game, ui_cells }
     }
+
     pub fn synch_board_to_ui(&self) {
         for i in 0..(WIDTH * WIDTH) {
             let cell = self.game.board.grid[i];
@@ -43,6 +44,7 @@ impl GameUi {
                 CellContent::Empty(n) => (false, SharedString::from(n.to_string())),
                 CellContent::Mine => (true, SharedString::from("")),
             };
+
             let is_revealed = cell.state == CellState::Revealed;
             let is_flagged = cell.state == CellState::Flagged;
 
@@ -54,7 +56,6 @@ impl GameUi {
                 is_revealed,
                 number,
             };
-
             self.ui_cells.set_row_data(i, data);
         }
     }
@@ -74,11 +75,6 @@ impl GameUi {
             return;
         }
 
-        if let Some(cell) = self.game.board.get_cell(x, y) {
-            if cell.state == CellState::Flagged {
-                return;
-            }
-        }
         self.game.reveal_cell(x, y);
         self.synch_board_to_ui();
         self.update_ui(ui);

@@ -17,11 +17,20 @@ export component MainWindow inherits Window {
     in-out property <string> game_status;
     in-out property <int> mines_left;
     in-out property <[CellData]> cells;
+    in-out property <int> current_index;
 
     VerticalLayout {
         alignment: start;
         spacing: 10px;
         padding: 10px;
+        Timer {
+            interval: 20ms;
+            running: true;
+            triggered => {
+                current_index = (current_index + 1);
+            }
+        }
+
         Text {
             text: "Minen: " + root.mines_left;
             font-size: 20px;
@@ -72,12 +81,25 @@ export component MainWindow inherits Window {
                 }
 
                 Image {
-                    source: @image-url("bomb.png");
+                    states [
+                        zero when current_index == 0: {
+                            source: @image-url("bomb.png");
+                        }
+                        one when current_index == 1: {
+                            source: @image-url("bomb_1.jpeg");
+                        }
+                        two when current_index == 2: {
+                            source: @image-url("Bomb_3.jpeg");
+                        }
+                        three when current_index == 3: {
+                            source: @image-url("Bomb_5.jpeg");
+                        }
+                        four when current_index == 4: {
+                            source: @image-url("Bomb_7.jpeg");
+                        }
+                    ]
                     width: 30px;
                     height: 30px;
-                    horizontal-alignment: center;
-                    vertical-alignment: center;
-                    visible: cell_data.is_mine && cell_data.is_revealed;
                 }
 
                 TouchArea {

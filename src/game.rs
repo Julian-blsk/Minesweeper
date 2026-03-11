@@ -28,6 +28,7 @@ impl Game {
             mines_placed: false,
         }
     }
+
     pub fn place_mines(&mut self, first_x: usize, first_y: usize) {
         let mut rng = rand::thread_rng();
         let mut placed = 0;
