@@ -66,6 +66,7 @@ impl GameUi {
             GameState::Running => "Laufend",
             GameState::Won => "Gewonnen",
         };
+
         ui.set_game_status(SharedString::from(status));
         ui.set_mines_left(self.game.mines_left as i32);
     }

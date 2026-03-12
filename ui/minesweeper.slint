@@ -17,17 +17,22 @@ export component MainWindow inherits Window {
     in-out property <string> game_status;
     in-out property <int> mines_left;
     in-out property <[CellData]> cells;
-    in-out property <int> current_index;
+    in-out property <int> current_index: 10;
+    //in-out property <bool> game_lost: false;
 
     VerticalLayout {
         alignment: start;
         spacing: 10px;
         padding: 10px;
-        Timer {
-            interval: 20ms;
+        timer := Timer {
+            interval: 1000ms;
             running: true;
             triggered => {
-                current_index = (current_index + 1);
+                current_index -= 1;
+                if current_index == 0 {
+                    debug("Timer Stop");
+                    timer.stop();
+                }
             }
         }
 
@@ -81,26 +86,59 @@ export component MainWindow inherits Window {
                 }
 
                 Image {
-                    states [
-                        zero when current_index == 0: {
-                            source: @image-url("bomb.png");
-                        }
-                        one when current_index == 1: {
-                            source: @image-url("bomb_1.jpeg");
-                        }
-                        two when current_index == 2: {
-                            source: @image-url("Bomb_3.jpeg");
-                        }
-                        three when current_index == 3: {
-                            source: @image-url("Bomb_5.jpeg");
-                        }
-                        four when current_index == 4: {
-                            source: @image-url("Bomb_7.jpeg");
-                        }
-                    ]
+                    source: @image-url("bomb.png");
                     width: 30px;
                     height: 30px;
+                    visible: current_index == 1 || current_index == 2;
                 }
+
+                /* Image {
+                    source: @image-url("bomb_1.jpeg");
+                    width: 30px;
+                    height: 30px;
+                    visible: current_index == 2;
+                }*/
+
+                /* Image {
+                    source: @image-url("Bomb_2.jpeg");
+                    width: 30px;
+                    height: 30px;
+                    visible: current_index == 3;
+                }*/
+
+                /*Image {
+                    source: @image-url("Bomb_3.jpeg");
+                    width: 30px;
+                    height: 30px;
+                }*/
+
+                /*Image {
+                    source: @image-url("Bomb_4.jpeg");
+                    width: 30px;
+                    height: 30px;
+                    visible: current_index == 5;
+                }*/
+
+                /*Image {
+                    source: @image-url("Bomb_5.jpeg");
+                    width: 30px;
+                    height: 30px;
+                    visible: current_index == 6;
+                }*/
+
+                /*Image {
+                    source: @image-url("Bomb_6.jpeg");
+                    width: 30px;
+                    height: 30px;
+                    visible: current_index == 7;
+                }*/
+
+                /*Image {
+                    source: @image-url("Bomb_7.jpeg");
+                    width: 30px;
+                    height: 30px;
+                    visible: current_index == 8;
+                }*/
 
                 TouchArea {
                     clicked => {
