@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 rand = "0.8"
-slint = "1.6"
+slint = {version = "1.6", features = ["renderer-software"]}
 
 [build-dependencies]
 slint-build = "1.6"
