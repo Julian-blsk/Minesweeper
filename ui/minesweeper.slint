@@ -1,4 +1,5 @@
 import { Button } from "std-widgets.slint";
+
 export struct CellData {
     x: int,
     y: int,
@@ -9,22 +10,18 @@ export struct CellData {
 }
 
 export component MainWindow inherits Window {
-    preferred-width: 573px;
-    preferred-height: 653px;
+    preferred-width: 600px;
+    preferred-height: 700px;
     title: "Minesweeper";
 
     callback cell_clicked(x: int, y: int);
     callback start_easy();
     callback start_hard();
     callback cell_right_clicked(x: int, y: int);
+
     in-out property <string> game_status;
     in-out property <int> mines_left;
     in-out property <[CellData]> cells;
-
-    HorizontalLayout {
-        alignment: center;
-        spacing: 20px;
-    }
 
     VerticalLayout {
         alignment: start;
@@ -40,7 +37,7 @@ export component MainWindow inherits Window {
 
         Text {
             text: root.game_status;
-            font-size: 20px;
+            font-size: 24px;
             horizontal-alignment: center;
         }
 
@@ -48,16 +45,14 @@ export component MainWindow inherits Window {
             text: "Easy";
             visible: game_status == "Hauptmenü";
             clicked => {
-                debug("Easy mode chosen");
                 root.start_easy();
             }
         }
 
         Button {
-            text: "Hard";
             visible: game_status == "Hauptmenü";
+            text: "Hard";
             clicked => {
-                debug("Hard mode chosen");
                 root.start_hard();
             }
         }
@@ -65,8 +60,10 @@ export component MainWindow inherits Window {
         GridLayout {
             visible: game_status != "Hauptmenü";
             spacing: 2px;
+
             for cell_data in cells: Rectangle {
                 property <int> current_index: -1;
+
                 timer := Timer {
                     interval: 30ms;
                     running: false;
@@ -83,25 +80,28 @@ export component MainWindow inherits Window {
                 height: 35px;
                 row: cell_data.y;
                 col: cell_data.x;
+
                 background: {
                     if cell_data.is_flagged {
                         #44ff44
                     } else if !cell_data.is_revealed {
-                        #4444ffff
+                        #4444ff
                     } else if cell_data.is_mine {
-                        #ff4444ff
+                        #ff4444
                     } else {
-                        #cccccccc
+                        #cccccc
                     }
                 }
+
                 border-width: 1px;
                 border-color: #000000;
+
                 Text {
                     text: cell_data.number;
                     color: black;
                     horizontal-alignment: center;
                     vertical-alignment: center;
-                    visible: cell_data.is_revealed && !cell_data.is_flagged;
+                    visible: cell_data.is_revealed && !cell_data.is_flagged && !cell_data.is_mine;
                 }
 
                 Image {
@@ -114,6 +114,9 @@ export component MainWindow inherits Window {
                 }
 
                 Image {
+                    visible: cell_data.is_mine && cell_data.is_revealed;
+                    width: 30px;
+                    height: 30px;
                     states [
                         zero when current_index == 0: {
                             source: @image-url("bomb.png");
@@ -140,21 +143,19 @@ export component MainWindow inherits Window {
                             source: @image-url("Bomb_7.jpeg");
                         }
                     ]
-                    width: 30px;
-                    height: 30px;
                 }
 
                 TouchArea {
                     clicked => {
-                        cell_clicked(cell_data.x, cell_data.y);
-                        if cell_data.is_mine {
+                        root.cell_clicked(cell_data.x, cell_data.y);
+                        if cell_data.is_mine && cell_data.is_revealed {
                             current_index = 0;
                             timer.running = true;
                         }
                     }
                     pointer-event(event) => {
                         if (event.button == PointerEventButton.right && event.kind == PointerEventKind.down) {
-                            cell_right_clicked(cell_data.x, cell_data.y);
+                            root.cell_right_clicked(cell_data.x, cell_data.y);
                         }
                     }
                 }

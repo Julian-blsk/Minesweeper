@@ -5,58 +5,61 @@ mod game_ui;
 
 slint::include_modules!();
 
-use std::{cell::RefCell, rc::Rc};
-
-use game::Game;
+use game::Difficulty;
 use game_ui::GameUi;
-use slint::ModelRc;
-
-use crate::game::GameState;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 fn main() {
-    let ui = MainWindow::new().unwrap();
+    let ui = MainWindow::new().expect("Failed to create UI");
     let game_ui = Rc::new(RefCell::new(GameUi::new()));
-    ui.set_cells(ModelRc::from(game_ui.borrow().ui_cells.clone()));
-    game_ui.borrow().update_ui(&ui);
 
-    let ui_handle_easy = ui.as_weak();
-    let game_handle_easy = game_ui.clone();
+    ui.set_cells(slint::ModelRc::from(game_ui.borrow().ui_cells.clone()));
+    game_ui.borrow().update_ui_status(&ui);
 
-    ui.on_start_easy(move || {
-        if let Some(ui) = ui_handle_easy.upgrade() {
-            let mut game = game_handle_easy.borrow_mut();
-            game.start_easy(&ui);
-        }
-    });
+    {
+        let ui_handle = ui.as_weak();
+        let game_handle = game_ui.clone();
+        ui.on_start_easy(move || {
+            if let Some(ui_instance) = ui_handle.upgrade() {
+                let mut game = game_handle.borrow_mut();
+                game.start_game(Difficulty::Easy, &ui_instance);
+            }
+        });
+    }
 
-    let ui_handle_hard = ui.as_weak();
-    let game_handle_hard = game_ui.clone();
+    {
+        let ui_handle = ui.as_weak();
+        let game_handle = game_ui.clone();
+        ui.on_start_hard(move || {
+            if let Some(ui_instance) = ui_handle.upgrade() {
+                let mut game = game_handle.borrow_mut();
+                game.start_game(Difficulty::Hard, &ui_instance);
+            }
+        });
+    }
 
-    ui.on_start_hard(move || {
-        if let Some(ui) = ui_handle_hard.upgrade() {
-            let mut game = game_handle_hard.borrow_mut();
-            game.start_hard(&ui);
-        }
-    });
+    {
+        let ui_handle = ui.as_weak();
+        let game_handle = game_ui.clone();
+        ui.on_cell_clicked(move |x, y| {
+            if let Some(ui_instance) = ui_handle.upgrade() {
+                let mut game = game_handle.borrow_mut();
+                game.handle_click(x as usize, y as usize, &ui_instance);
+            }
+        });
+    }
 
-    let ui_handle = ui.as_weak();
-    let game_handle = game_ui.clone();
+    {
+        let ui_handle = ui.as_weak();
+        let game_handle = game_ui.clone();
+        ui.on_cell_right_clicked(move |x, y| {
+            if let Some(ui_instance) = ui_handle.upgrade() {
+                let mut game = game_handle.borrow_mut();
+                game.handle_right_click(x as usize, y as usize, &ui_instance);
+            }
+        });
+    }
 
-    ui.on_cell_clicked(move |x, y| {
-        let ui = ui_handle.upgrade().unwrap();
-        let mut game = game_handle.borrow_mut();
-        game.handle_click(x as usize, y as usize, &ui);
-    });
-
-    let ui_right_handle = ui.as_weak();
-    let right_game_handle = game_ui.clone();
-
-    ui.on_cell_right_clicked(move |x, y| {
-        let ui = ui_right_handle.upgrade().unwrap();
-        let mut game = right_game_handle.borrow_mut();
-        game.handle_right_click(x as usize, y as usize, &ui);
-    });
-
-    game_ui.borrow().update_ui(&ui);
-    ui.run().unwrap();
+    ui.run().expect("UI Loop failed");
 }
