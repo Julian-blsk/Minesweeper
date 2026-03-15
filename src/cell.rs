@@ -1,7 +1,6 @@
 pub const WIDTH: usize = 15;
 pub const HEIGHT: usize = 15;
 pub const TOTAL_CELLS: usize = WIDTH * HEIGHT;
-pub const TOTAL_MINES: usize = 25;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum CellContent {

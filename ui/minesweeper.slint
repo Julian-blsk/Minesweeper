@@ -1,3 +1,4 @@
+import { Button } from "std-widgets.slint";
 export struct CellData {
     x: int,
     y: int,
@@ -13,10 +14,17 @@ export component MainWindow inherits Window {
     title: "Minesweeper";
 
     callback cell_clicked(x: int, y: int);
+    callback start_easy();
+    callback start_hard();
     callback cell_right_clicked(x: int, y: int);
     in-out property <string> game_status;
     in-out property <int> mines_left;
     in-out property <[CellData]> cells;
+
+    HorizontalLayout {
+        alignment: center;
+        spacing: 20px;
+    }
 
     VerticalLayout {
         alignment: start;
@@ -27,6 +35,7 @@ export component MainWindow inherits Window {
             text: "Minen: " + root.mines_left;
             font-size: 20px;
             horizontal-alignment: center;
+            visible: game_status == "Laufend";
         }
 
         Text {
@@ -35,12 +44,31 @@ export component MainWindow inherits Window {
             horizontal-alignment: center;
         }
 
+        Button {
+            text: "Easy";
+            visible: game_status == "Hauptmenü";
+            clicked => {
+                debug("Easy mode chosen");
+                root.start_easy();
+            }
+        }
+
+        Button {
+            text: "Hard";
+            visible: game_status == "Hauptmenü";
+            clicked => {
+                debug("Hard mode chosen");
+                root.start_hard();
+            }
+        }
+
         GridLayout {
+            visible: game_status != "Hauptmenü";
             spacing: 2px;
             for cell_data in cells: Rectangle {
                 property <int> current_index: -1;
                 timer := Timer {
-                    interval: 10ms;
+                    interval: 30ms;
                     running: false;
                     triggered => {
                         current_index = (current_index + 1);
@@ -114,56 +142,7 @@ export component MainWindow inherits Window {
                     ]
                     width: 30px;
                     height: 30px;
-                    visible: current_index == 1 || current_index == 2;
                 }
-
-                /* Image {
-                    source: @image-url("bomb_1.jpeg");
-                    width: 30px;
-                    height: 30px;
-                    visible: current_index == 2;
-                }*/
-
-                /* Image {
-                    source: @image-url("Bomb_2.jpeg");
-                    width: 30px;
-                    height: 30px;
-                    visible: current_index == 3;
-                }*/
-
-                /*Image {
-                    source: @image-url("Bomb_3.jpeg");
-                    width: 30px;
-                    height: 30px;
-                }*/
-
-                /*Image {
-                    source: @image-url("Bomb_4.jpeg");
-                    width: 30px;
-                    height: 30px;
-                    visible: current_index == 5;
-                }*/
-
-                /*Image {
-                    source: @image-url("Bomb_5.jpeg");
-                    width: 30px;
-                    height: 30px;
-                    visible: current_index == 6;
-                }*/
-
-                /*Image {
-                    source: @image-url("Bomb_6.jpeg");
-                    width: 30px;
-                    height: 30px;
-                    visible: current_index == 7;
-                }*/
-
-                /*Image {
-                    source: @image-url("Bomb_7.jpeg");
-                    width: 30px;
-                    height: 30px;
-                    visible: current_index == 8;
-                }*/
 
                 TouchArea {
                     clicked => {

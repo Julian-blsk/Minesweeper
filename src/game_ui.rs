@@ -15,7 +15,7 @@ pub struct GameUi {
 
 impl GameUi {
     pub fn new() -> Self {
-        let game = Game::new();
+        let game = Game::new(&GameState::MainMenu);
 
         let mut cells = Vec::new();
         for i in 0..(WIDTH * WIDTH) {
@@ -32,6 +32,18 @@ impl GameUi {
         let ui_cells = Rc::new(VecModel::from(cells));
 
         Self { game, ui_cells }
+    }
+
+    pub fn start_easy(&mut self, ui: &MainWindow) {
+        self.game.set_difficulty(GameState::Easy);
+        self.synch_board_to_ui();
+        self.update_ui(ui);
+    }
+
+    pub fn start_hard(&mut self, ui: &MainWindow) {
+        self.game.set_difficulty(GameState::Hard);
+        self.synch_board_to_ui();
+        self.update_ui(ui);
     }
 
     pub fn synch_board_to_ui(&self) {
@@ -62,9 +74,11 @@ impl GameUi {
 
     pub fn update_ui(&self, ui: &MainWindow) {
         let status = match self.game.state {
+            GameState::MainMenu => "Hauptmenü",
             GameState::Lost => "Verloren",
-            GameState::Running => "Laufend",
+            GameState::Easy => "Laufend",
             GameState::Won => "Gewonnen",
+            GameState::Hard => "Laufend",
         };
 
         ui.set_game_status(SharedString::from(status));
@@ -72,7 +86,7 @@ impl GameUi {
     }
 
     pub fn handle_click(&mut self, x: usize, y: usize, ui: &MainWindow) {
-        if self.game.state != GameState::Running {
+        if self.game.state != GameState::Easy && self.game.state != GameState::Hard {
             return;
         }
 
@@ -82,7 +96,7 @@ impl GameUi {
     }
 
     pub fn handle_right_click(&mut self, x: usize, y: usize, ui: &MainWindow) {
-        if self.game.state != GameState::Running {
+        if self.game.state != GameState::Easy && self.game.state != GameState::Hard {
             return;
         }
 

@@ -1,12 +1,15 @@
+use crate::MainWindow;
 use crate::board::Board;
-use crate::cell::{Cell, CellContent, CellState, HEIGHT, TOTAL_CELLS, TOTAL_MINES, WIDTH};
+use crate::cell::{Cell, CellContent, CellState, HEIGHT, TOTAL_CELLS, WIDTH};
 use rand::Rng;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum GameState {
     Won,
     Lost,
-    Running,
+    Easy,
+    Hard,
+    MainMenu,
 }
 
 #[derive(Clone)]
@@ -15,25 +18,45 @@ pub struct Game {
     pub board: Board,
     pub mines_left: usize,
     pub mines_placed: bool,
+    pub total_mines: usize,
 }
 
 impl Game {
-    pub fn new() -> Self {
+    pub fn new(start_state: &GameState) -> Self {
+        let total_mines = match start_state {
+            GameState::Easy => 20,
+            GameState::Hard => 50,
+            _ => 0,
+        };
+
         Self {
-            state: GameState::Running,
+            state: GameState::MainMenu,
             board: Board {
                 grid: [Cell::default(); TOTAL_CELLS],
             },
-            mines_left: TOTAL_MINES,
+            mines_left: total_mines,
+            total_mines,
             mines_placed: false,
         }
+    }
+
+    pub fn set_difficulty(&mut self, difficulty: GameState) {
+        self.state = difficulty;
+        self.board = Board::new();
+        self.mines_placed = false;
+        self.total_mines = match difficulty {
+            GameState::Easy => 20,
+            GameState::Hard => 50,
+            _ => 0,
+        };
+        self.mines_left = self.total_mines;
     }
 
     pub fn place_mines(&mut self, first_x: usize, first_y: usize) {
         let mut rng = rand::thread_rng();
         let mut placed = 0;
 
-        while placed < TOTAL_MINES {
+        while placed < self.total_mines {
             let x = rng.gen_range(0..WIDTH);
             let y = rng.gen_range(0..HEIGHT);
 
@@ -107,7 +130,7 @@ impl Game {
         }
     }
     pub fn set_flag(&mut self, x: usize, y: usize) {
-        if self.state != GameState::Running {
+        if self.state != GameState::Easy && self.state != GameState::Hard {
             return;
         }
 
